@@ -9,16 +9,25 @@ private:
     void reAllocMem();
 
 public:
+     // Constructors
     MyVector(int num=2);
     MyVector(const MyVector& sourceVec);
+
+    // Destructor
     ~MyVector();
+
+
+     // Methods------------------------------------------------------
     void push_back(const T &elem);
-    void add(const T &elem);
-    T& operator[] (int i)const;
-    MyVector<T>& operator=(const MyVector& sourceVec);
+    void add(const T &elem);    
     int size();
     void clear();
     int capacity();
+
+
+    // Operators-----------------------------------------------------
+    T& operator[] (int i)const;
+    MyVector<T>& operator=(const MyVector& sourceVec);
 };
 
 template<class T>

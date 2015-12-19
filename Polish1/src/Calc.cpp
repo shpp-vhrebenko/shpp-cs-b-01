@@ -13,22 +13,22 @@
 using namespace std;
 
 /*The function returns the edited user input formula.*/
-string getInputFormula();
+string getFormula();
 
 /*The editing function entered by the user formula.
  * @param - User-entered formula is presented as a string.
  */
-string editInputFunction(string inputString);
+string editFunction(string inputString);
 
 /*The function checks whether a string of function syntax.
- * @param - The string that is entered by the user part of formulating.
+ * @param - The string that is entered by the user.
  */
 bool isFunctions(string scannerString);
 
 /*The conversion function user-entered formulas in RPN.
  * @param- User-entered formula.
  */
-MyVector<string> conversionFunctionInRPNformat(string inputFormula);
+MyVector<string> conversionFunction(string inputFormula);
 
 /*The function determines the priority of operations.
  *@param-character operation.
@@ -38,20 +38,20 @@ int priority(string symbol);
 /*The function of a variable in a formula.
  *@param - Vector<string>, user-entered formulas in RPN format.
  */
-MyVector<string> finding_variables(MyVector<string> inputFormulaInPRNformat);
+MyVector<string> findingVariables(MyVector<string> formula_PRN);
 
 /*The function test is not met there is already a variable in the formula.
 @param - string, The found variable.
 @param - Vector<string>, Array variables found.
 */
-bool finding_matching_variables(string elem,MyVector<string> variables);
+bool isVar_init(string elem,MyVector<string> variables);
 
 /*Initialize the variables in the formula.
 @param - Vector<string>,user-entered formulas in RPN format.
 @param - string, variable.
 @param - double, value variable.
  */
-MyVector<string>  initializeVariableInFormula(MyVector<string> result,string sr,double a);
+MyVector<string>  initializeVariable(MyVector<string> result,string sr,double a);
 
 /*This function defines the syntax of user-entered formula should calculate the result,
  *  or plotting functions.
@@ -59,18 +59,18 @@ MyVector<string>  initializeVariableInFormula(MyVector<string> result,string sr,
  * @param - string, The formula entered by the user in the usual format.
  * return - Returns formula with initialized variables.
  */
-void handlerPath(MyVector<string> formulaInPRNformat,string inputFormula);
+void handlerPath(MyVector<string> resultFormula,string inputFormula);
 
 /*The function checks the variable 'x' in the formula.
  *@param - Vector<string>,user-entered formulas in RPN format.
  */
-bool presence_variable_X(MyVector<string> formulaInPRNformat);
+bool isPresent_X(MyVector<string> resultFormula);
 
 /*Draw the graph of the function.
  * @param - Vector<string>,user-entered formulas in RPN format.
  * @param - string, The formula entered by the user in the usual format.
 */
-void creating_graph(MyVector<string> formulaInPRNformat,string inputFormula);
+void creatingSchedule(MyVector<string> resultFormula,string inputFormula);
 
 /*Function draw coordinate system.
 * @param - GWindow, Subject to display graphics.
@@ -82,7 +82,7 @@ pair<double, double> drawCoordinateSystem(GWindow &graphicsWindow, int scale);
 /*Calculation results entered by the user formula.
 * @param - Vector<string>,user-entered formulas in RPN format.
 */
-double calculationEquationPRN(MyVector<string> inputOpn);
+double calcFormula(MyVector<string> inputOpn);
 
 /*The function checks whether a character is an operator.
 * @param - string, the character you want to check.
@@ -97,17 +97,17 @@ int main()
 
     while(true){
         // We obtain a formula (function) that the user enters.
-        string inputFormula = getInputFormula();
+        string inputFormula = getFormula();
 
         // Transform the formula into RPN.
-        MyVector<string> inputFormulaInRPNformat = conversionFunctionInRPNformat(inputFormula);
+        MyVector<string> formula_RPN = conversionFunction(inputFormula);
 
         // We find in the formula variables and specify the name of the values that the user specifies.
-        MyVector<string> formulaInRPNformat = finding_variables(inputFormulaInRPNformat);
+        MyVector<string> resulFormula = findingVariables(formula_RPN);
 
         // The handler determines whether the path plotting functions
         //In the presence of the variable 'x' or the calculation result in its absence.
-        handlerPath(formulaInRPNformat,inputFormula);
+        handlerPath(resulFormula,inputFormula);
 
         if (!getYesOrNo("Do you want build ones more functions graphic? (y/n): "))
             break;
@@ -118,7 +118,7 @@ int main()
 }
 
 // We obtain a formula (function) that the user enters.
-string getInputFormula(){
+string getFormula(){
     string result = "";
     string inputFormula = "";
     while(true){
@@ -128,12 +128,12 @@ string getInputFormula(){
         }
         cout<<"Incorrect input format funktion.Try enter again."<<endl;
     }
-    result = editInputFunction(inputFormula);
+    result = editFunction(inputFormula);
     return result;
 }
 
 //Edit the resulting formula (remove spaces, we arrange marks multiplication).
-string editInputFunction(string inputString){
+string editFunction(string inputString){
     string result = "";
     string scannerString = "";
     char previos;
@@ -203,7 +203,7 @@ string editInputFunction(string inputString){
             else{
                 result += scannerString;
             }
-       }
+        }
     }
 
     cout<<"InputFunction : "<<result<<endl;
@@ -226,8 +226,9 @@ bool isFunctions(string scannerString){
     return false;
 }
 
+
 // Transform the formula into RPN.
-MyVector<string> conversionFunctionInRPNformat(string inputFormula){
+MyVector<string> conversionFunction(string inputFormula){
     MyStack <string> StackOperands;
     MyVector<string> result;
     string scannerString = "";
@@ -237,23 +238,23 @@ MyVector<string> conversionFunctionInRPNformat(string inputFormula){
     while(scanner.hasMoreTokens()){
         scannerString = scanner.nextToken();
         if(isdigit(scannerString[0])){
-            result.add(scannerString);            
+            result.add(scannerString);
         }
         else if(isalpha(scannerString[0])&& scannerString.length() == 1){
-            result.add(scannerString);            
+            result.add(scannerString);
         }
         else if(!StackOperands.empty() && scannerString== "("){
-            StackOperands.push(scannerString);                       
+            StackOperands.push(scannerString);
         }
         else if(!StackOperands.empty() && scannerString== ")"){
             while(StackOperands.top() != "("){
-                result.add(StackOperands.top());                
-                StackOperands.pop();                
+                result.add(StackOperands.top());
+                StackOperands.pop();
             }
-            StackOperands.pop();           
+            StackOperands.pop();
         }
         else if(!StackOperands.empty() &&  priority(scannerString) <= priority(StackOperands.top()) ){
-            string topSteck = StackOperands.top();            
+            string topSteck = StackOperands.top();
             while(priority(scannerString) <= priority(topSteck) && !StackOperands.empty()){
                 topSteck = StackOperands.top();
                 if(topSteck == "("){
@@ -265,10 +266,10 @@ MyVector<string> conversionFunctionInRPNformat(string inputFormula){
             StackOperands.push(scannerString);
         }
         else if(scannerString == "sqrt" || scannerString == "sin" || scannerString == "cos"){
-            StackOperands.push(scannerString);            
+            StackOperands.push(scannerString);
         }
         else{
-            StackOperands.push(scannerString);                       
+            StackOperands.push(scannerString);
         }
 
 
@@ -316,19 +317,19 @@ int priority(string symbol)
 }
 
 // Find the variables in formule.I request the user variable values.
-MyVector<string> finding_variables(MyVector<string> inputFormulaInPRNformat){
-    MyVector<string> result = inputFormulaInPRNformat;
+MyVector<string> findingVariables(MyVector<string> formula_RPN){
+    MyVector<string> result = formula_RPN;
     string elem = "";
     MyVector<string> variables;
     variables.add("variables");
     double findVar = 0;
-    for(int i(0);i<inputFormulaInPRNformat.size();i++){
-        elem = inputFormulaInPRNformat[i];
+    for(int i(0);i<formula_RPN.size();i++){
+        elem = formula_RPN[i];
         if(isalpha(elem[0]) && elem.length() == 1){
-            if(elem != "x" && !finding_matching_variables(elem,variables)){
+            if(elem != "x" && !isVar_init(elem,variables)){
                 cout<<"Enter value "<<elem<<" :";
                 cin>>findVar;
-                result = initializeVariableInFormula(result,elem,findVar);
+                result = initializeVariable(result,elem,findVar);
 
                 variables.add(elem);
             }
@@ -340,7 +341,7 @@ MyVector<string> finding_variables(MyVector<string> inputFormulaInPRNformat){
 }
 
 // Checking for repetition variable in the formula.
-bool finding_matching_variables(string elem,MyVector<string> variables){
+bool isVar_init(string elem,MyVector<string> variables){
     for(int i(0);i<variables.size();i++){
         if(variables[i] == elem){
             return true;
@@ -350,7 +351,7 @@ bool finding_matching_variables(string elem,MyVector<string> variables){
 }
 
 // Initialize a variable value in the formula.
-MyVector<string> initializeVariableInFormula(MyVector<string> result,string sr,double a){
+MyVector<string> initializeVariable(MyVector<string> result,string sr,double a){
     string elem = "";
     for(int i(0);i<result.size();i++){
         if(result[i] == sr){
@@ -363,21 +364,21 @@ MyVector<string> initializeVariableInFormula(MyVector<string> result,string sr,d
 
 // The handler determines whether the path plotting function
 //In the presence of the variable 'x' or the calculation result in its absence.
-void handlerPath(MyVector<string> formulaInPRNformat,string inputFormula){
-    if(presence_variable_X(formulaInPRNformat)){
-        creating_graph(formulaInPRNformat,inputFormula);
+void handlerPath(MyVector<string> resulFormula,string inputFormula){
+    if(isPresent_X(resulFormula)){
+        creatingSchedule(resulFormula,inputFormula);
     }
     else{
-        double result = calculationEquationPRN(formulaInPRNformat);
+        double result = calcFormula(resulFormula);
         cout << "result = "<< result << endl;
     }
 }
 
 // Checking for the presence of variable 'x' in the formula.
-bool presence_variable_X(MyVector<string> formulaInPRNformat){
+bool isPresent_X(MyVector<string> resulFormula){
     bool present = false;
-    for(int i(0);i<formulaInPRNformat.size();i++){
-        if(formulaInPRNformat[i] == "x"){
+    for(int i(0);i<resulFormula.size();i++){
+        if(resulFormula[i] == "x"){
             present = true;
         }
 
@@ -401,7 +402,7 @@ pair<double, double> drawCoordinateSystem(GWindow &graphicsWindow,int scale) {
 }
 
 // Drawing graphics features introduced. Before these requested maximum and minimum value 'x'.
-void creating_graph(MyVector<string> formulaInRPNformat,string inputFormula){
+void creatingSchedule(MyVector<string> resulFormula,string inputFormula){
     double xMin = getReal("Enter the left arguments scope value(-20 to 20): x min = ");
     double xMax = getReal("Enter the right arguments scope value(-20 to 20): x max = ");
     GWindow graphicsWindow(800, 600);
@@ -414,11 +415,11 @@ void creating_graph(MyVector<string> formulaInRPNformat,string inputFormula){
     graphicsWindow.setColor("RED");
     string str = "x";
     double prewX = xMin;
-    MyVector<string> formulaPRN = initializeVariableInFormula(formulaInRPNformat,str,prewX);
-    double prewY = calculationEquationPRN(formulaPRN);
+    MyVector<string> formulaPRN = initializeVariable(resulFormula,str,prewX);
+    double prewY = calcFormula(formulaPRN);
     for (double x = xMin + 0.01; x <= xMax; x += 0.01) {
-        formulaPRN = initializeVariableInFormula(formulaInRPNformat,str,x);
-        double y = calculationEquationPRN(formulaPRN);;
+        formulaPRN = initializeVariable(resulFormula,str,x);
+        double y = calcFormula(formulaPRN);
         graphicsWindow.drawLine(center.first + prewX * scale, center.second - prewY * scale,
                                 center.first + x * scale, center.second - y * scale);
         prewX = x;
@@ -427,7 +428,7 @@ void creating_graph(MyVector<string> formulaInRPNformat,string inputFormula){
 }
 
 // The calculation expression is written in reverse Polish notation.
-double calculationEquationPRN(MyVector<string> inputOpn){
+double calcFormula(MyVector<string> inputOpn){
     double result = 0;
     MyStack <double> temp;
     double a = 0.0;
@@ -479,7 +480,7 @@ double calculationEquationPRN(MyVector<string> inputOpn){
 
                         }
                         else{
-                        result = (b / a);
+                            result = (b / a);
                         }
                     }
                     else if(inputOpn[i] == "^"){
